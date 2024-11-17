@@ -24,8 +24,13 @@ request(url, (error, response, body) => {
   const film = JSON.parse(body);
   const characters = film.characters;
 
-  characters.forEach((characterUrl) => {
-    request(characterUrl, (error, response, body) => {
+  // Function to fetch and print character names sequentially
+  const fetchCharacter = (index) => {
+    if (index >= characters.length) {
+      return;
+    }
+
+    request(characters[index], (error, response, body) => {
       if (error) {
         console.error('Error:', error);
         return;
@@ -33,6 +38,9 @@ request(url, (error, response, body) => {
 
       const character = JSON.parse(body);
       console.log(character.name);
+      fetchCharacter(index + 1); // Proceed to the next character
     });
-  });
+  };
+
+  fetchCharacter(0); // Start fetching from the first character
 });
