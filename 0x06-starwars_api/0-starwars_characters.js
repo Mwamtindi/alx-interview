@@ -24,23 +24,23 @@ request(url, (error, response, body) => {
   const film = JSON.parse(body);
   const characters = film.characters;
 
-  // Function to fetch and print character names sequentially
-  const fetchCharacter = (index) => {
-    if (index >= characters.length) {
-      return;
-    }
-
-    request(characters[index], (error, response, body) => {
-      if (error) {
-        console.error('Error:', error);
-        return;
-      }
-
-      const character = JSON.parse(body);
-      console.log(character.name);
-      fetchCharacter(index + 1); // Proceed to the next character
+  // Fetch all character names in parallel
+  const promises = characters.map((characterUrl) => {
+    return new Promise((resolve, reject) => {
+      request(characterUrl, (error, response, body) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+        const character = JSON.parse(body);
+        resolve(character.name);
+      });
     });
-  };
+  });
 
-  fetchCharacter(0); // Start fetching from the first character
+  Promise.all(promises)
+    .then((names) => {
+      names.forEach((name) => console.log(name));
+    })
+    .catch((error) => console.error('Error:', error));
 });
