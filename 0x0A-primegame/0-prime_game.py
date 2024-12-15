@@ -1,4 +1,6 @@
 #!/usr/bin/python3
+"""A module with fxn isWinner used to printout a winner in a game`"""
+
 
 def isWinner(x, nums):
     """
